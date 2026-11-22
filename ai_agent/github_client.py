@@ -15,8 +15,13 @@ class GitHubPRClient:
             cwd=cwd,
             capture_output=True,
             text=True,
-            check=True,
         )
+        if res.returncode != 0:
+            raise RuntimeError(
+                f"git {' '.join(args)} failed (exit {res.returncode}):\n"
+                f"STDOUT: {res.stdout.strip()}\n"
+                f"STDERR: {res.stderr.strip()}"
+            )
         return res.stdout.strip()
 
     def create_branch_commit_and_push(
