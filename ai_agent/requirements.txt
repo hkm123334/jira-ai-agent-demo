@@ -1,0 +1,6 @@
+langgraph>=1.2.0
+langchain-google-genai>=4.5.0
+pydantic>=2.7.0
+requests>=2.32.0
+python-dotenv>=1.0.1
+PyGithub>=2.10.0

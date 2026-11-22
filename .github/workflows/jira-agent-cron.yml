@@ -1,0 +1,40 @@
+name: Jira-to-PR AI Agent (Free Cron Poller)
+
+on:
+  # Runs every 15 minutes automatically (does NOT use Jira Automation steps)
+  # Uncomment the schedule block below when you want continuous polling enabled:
+  # schedule:
+  #   - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  poll-jira:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install agent dependencies
+        run: pip install -r ai_agent/requirements.txt
+
+      - name: Poll Jira for ai-ready and ai-approved tickets
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_PROJECT_KEY: ${{ vars.JIRA_PROJECT_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_BASE_BRANCH: ${{ github.ref_name }}
+          TEST_COMMAND: ${{ vars.TEST_COMMAND }}
+        run: python ai_agent/poll_jira.py
